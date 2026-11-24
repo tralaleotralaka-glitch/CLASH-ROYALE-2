@@ -1,0 +1,35 @@
+plugins {
+    id 'com.android.application' version '8.7.3'
+}
+
+android {
+    namespace 'io.github.clashroyale.arena'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'io.github.clashroyale.arena'
+        minSdk 26
+        targetSdk 35
+        versionCode 1
+        versionName '1.0.0'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+// Vite's output is bundled under assets/www so the game does not need network access.
+def syncWebAssets = tasks.register('syncWebAssets', Sync) {
+    def webDist = rootProject.layout.projectDirectory.dir('../dist')
+    from webDist
+    into layout.buildDirectory.dir('generated/gameAssets/www')
+    doFirst {
+        if (!webDist.file('index.html').asFile.isFile()) {
+            throw new GradleException('Build web assets first: npm ci && npm run build')
+        }
+    }
+}
+android.sourceSets.main.assets.srcDir(layout.buildDirectory.dir('generated/gameAssets'))
+tasks.named('preBuild').configure { dependsOn syncWebAssets }

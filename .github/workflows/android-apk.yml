@@ -1,0 +1,51 @@
+name: Android APK
+
+on:
+  push:
+    paths:
+      - '.github/workflows/android-apk.yml'
+      - 'android/**'
+      - 'public/**'
+      - 'src/**'
+      - 'test/**'
+      - 'index.html'
+      - 'package*.json'
+      - 'vite.config.js'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Install Android SDK packages
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Assemble APK
+        run: gradle --project-dir android --no-daemon :app:assembleDebug
+      - name: Verify signature and prepare download
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk Clash-Royale-Arena.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose Clash-Royale-Arena.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Clash-Royale-Arena-APK
+          path: Clash-Royale-Arena.apk
+          if-no-files-found: error
