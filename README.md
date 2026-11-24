@@ -26,7 +26,9 @@ npm run dev
 
 Для установки нужен Android 8.0 (API 26) или новее с актуальным Android System WebView. Интернет для игры не нужен. Сборка подписана отладочным ключом и предназначена для прямой установки, а не для Google Play.
 
-На GitHub workflow **Android APK** сохраняет `Clash-Royale-Arena.apk` в артефактах. Сборка вручную: с установленными JDK 17, Gradle 8.9, Android SDK Platform 35 и Build Tools 35.0.0 выполните:
+Готовый APK можно скачать из [GitHub Releases](https://github.com/tralaleotralaka-glitch/CLASH-ROYALE-2/releases). Workflow **Android APK** также сохраняет APK в артефактах. Для публикации новой версии обновите `versionCode` и `versionName` в `android/app/build.gradle`, затем запустите workflow с опцией публикации или отправьте коммит с пометкой `[publish android]`.
+
+Сборка вручную: с установленными JDK 17, Gradle 8.9, Android SDK Platform 35 и Build Tools 35.0.0 выполните:
 
 ```sh
 npm ci
